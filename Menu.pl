@@ -152,7 +152,7 @@ sub Longueur_proteine{
   }
   $req->finish;
   print "\nNombre de protéines de longueur $longueur : $compteur\n";
-  if (choix==1){
+  if ($choix==1){
     print FILE "</table>\n<p> Il y a $compteur protéines de longueur $longueur</p>\n";
   }
 }
