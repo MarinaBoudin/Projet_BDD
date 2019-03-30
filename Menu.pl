@@ -189,7 +189,6 @@ sub Proteine_caracteristique{
 sub begin_html{
   $fichier = shift;
   $fichier="$fichier.html";
-  print "$fichier";
   my $ok=<STDIN>;
   open(FILE,">$fichier");
   print FILE "<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n<title>Vos résultats</title>\n<meta charset=\"utf-8\">\n</head>\n<body>\n<div>\n";
