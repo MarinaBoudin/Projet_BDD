@@ -196,6 +196,7 @@ while($a==0){
   my $b=<STDIN>;
   chomp($b);
   $b=int($b);
+  print "coucou";
   if ($b==1){
     Ajouter_proteine();
   }
@@ -220,7 +221,6 @@ while($a==0){
     elsif($choix==2){
       Nom_genes(2);
     }
-
   }
   elsif($b==5){
     begin_html("Longueur_proteine.html");
