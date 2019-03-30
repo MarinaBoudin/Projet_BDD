@@ -193,6 +193,7 @@ while($a==0){
   print "5: Afficher les protéines ayant une longueur au moins égale à une valeur\n";
   print "6: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
   print "0: Quitter\n";
+  my $b=<STDIN>;
   chomp($b);
   $b=int($b);
   if ($b==1){
