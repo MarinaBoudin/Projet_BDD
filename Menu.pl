@@ -181,7 +181,7 @@ sub Proteine_caracteristique(){
 
 sub begin_html{
   $fichier = shift;
-  $fichier=$fichier+".html";
+  $fichier="$fichier.html";
   print "$fichier";
   my $ok=<STDIN>;
   open(FILE,">$fichier");
