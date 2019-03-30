@@ -205,12 +205,22 @@ sub Longueur_Proteine_Perl{
 	if($l1!=1){
 	    my @val=split(/\t/,$_);
 	    my $organism="$val[5]";
-	    if($organism=~/Arabidopsis thaliana/){
-		my $entry="$val[0]";
-		my $protein_name="$val[3]";
-		my $length=int($val[6]);
-		$Longueur_Proteine{$entry}=[$length,$protein_name];
+	if($organism=~/Arabidopsis thaliana/){
+	    my $ec="'NaN'";
+	    my $entry="$val[0]";
+	    my $entry_name="$val[1]";
+	    my $statut="$val[2]";
+	    my $protein_name="$val[3]";
+	    if($protein_name=~/(EC\s(\d+|\-)\.(\d+|\-)\.(\d+|\-)\.(\d+|\-))/){
+		$ec="$1";
 	    }
+	    my $gene_name="$val[4]";
+	    my $length=int($val[6]);
+	    my $gene_namesyn="$val[7]";
+	    my $gene_ontology="$val[8]";
+	    my $ensembl="$val[9]";
+	    my $sequence="$val[10]";
+	    $Longueur_Proteine{$entry}=[$entry_name,$statut,$protein_name,$gene_name,$length,$gene_namesyn,$gene_ontology,$ensembl,$sequence];}
 	}
     }
     close(IN);
@@ -220,9 +230,9 @@ sub Longueur_Proteine_Perl{
     chomp($longueur);
     $longueur=int($longueur);
     foreach my $key(keys %Longueur_Proteine){
-	if($Longueur_Proteine{$key}[0]>=$longueur){
+	if($Longueur_Proteine{$key}[4]>=$longueur){
 	    $compteur++;
-	    print "$Longueur_Proteine{$key}[1] \n";
+	    print "$Longueur_Proteine{$key}[0]  $Longueur_Proteine{$key}[1]  $Longueur_Proteine{$key}[2]  $Longueur_Proteine{$key}[3]  $Longueur_Proteine{$key}[4]  $Longueur_Proteine{$key}[5]  $Longueur_Proteine{$key}[6]  $Longueur_Proteine{$key}[7]  $Longueur_Proteine{$key}[8] \n";
 	}
     }
     print "Nombre de Protéines de longueur $longueur : $compteur (Perl)\n";
