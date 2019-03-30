@@ -186,7 +186,7 @@ sub end_html(){
 
 my $a=0;
 while($a==0){
-  print "1: Ajouter une protéine\n";
+  print "\n1: Ajouter une protéine\n";
   print "2: Modifier/Corriger une séquence\n";
   print "3: Afficher le nom des protéines qui sont référencés dans le fichier EnsemblPlant\n";
   print "4: Afficher le nom des gènes du fichier UniProt qui sont également réferencés dans le fichier EnsemblPlant\n";
