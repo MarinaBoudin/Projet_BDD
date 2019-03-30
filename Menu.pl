@@ -113,7 +113,7 @@ sub Nom_proteine(){
 }
 
 sub Nom_genes{
-  my $choix=(shift)+".html";
+  my $choix=shift;
   print "$choix";
   if ($choix==1){
     print FILE "<h1 style=\"text-align:center\">Voici le nom des gènes</h1>\n<table style=\"border:2px solid\">\n<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">Nom des gènes</td></tr>\n";
@@ -180,7 +180,7 @@ sub Proteine_caracteristique(){
 }
 
 sub begin_html{
-  $fichier = shift;
+  $fichier = shift*".html";
   open(FILE,">$fichier");
   print FILE "<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n<title>Vos résultats</title>\n<meta charset=\"utf-8\">\n</head>\n<body>\n<div>\n";
 }
