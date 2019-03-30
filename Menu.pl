@@ -194,9 +194,11 @@ while($a==0){
   print "6: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
   print "0: Quitter\n";
   my $b=<STDIN>;
+  print "coucou1";
   chomp($b);
+  print "coucou2";
   $b=int($b);
-  print "coucou";
+  print "coucou3";
   if ($b==1){
     Ajouter_proteine();
   }
