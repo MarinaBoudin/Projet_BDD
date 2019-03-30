@@ -173,6 +173,39 @@ sub end_html(){
     print FILE "</div>\n</body>";
     close(FILE);
 }
+sub Longueur_Proteine_Perl{
+    open(IN,"../uniprot-arabidopsisthalianaSequence.tab") || die "No file";
+    my $l1=0;
+    my %Longueur_Proteine;
+    while(<IN>){
+	$l1++;
+	if($l1!=1){
+	    my @val=split(/\t/,$_);
+	    my $organism="$val[5]";
+	    if($organism=~/Arabidopsis thaliana/){
+		my $entry="$val[0]";
+		my $protein_name="$val[3]";
+		my $length=int($val[6]);
+		$Longueur_Proteine{$entry}=[$length,$protein_name];
+	    }
+	}
+    }
+    close(IN);
+    $compteur=0;
+    print "\nRentrez la valeur minimum de la longueur des séquence :(Perl)\n";
+    my $longueur=<STDIN>;
+    chomp($longueur);
+    $longueur=int($longueur);
+    foreach my $key(keys %Longueur_Proteine){
+	if($Longueur_Proteine{$key}[0]>=$longueur){
+	    $compteur++;
+	    print "$Longueur_Proteine{$key}[1] \n";
+	}
+    }
+    print "Nombre de Protéines de longueur $longueur : $compteur (Perl)\n";
+}
+   
+
 
 #Menu
 
@@ -182,8 +215,9 @@ while($a==0){
     print "2: Modifier/Corriger une séquence\n";
     print "3: Afficher le nom des protéines qui sont référencés dans le fichier EnsemblPlant\n";
     print "4: Afficher le nom des gènes du fichier UniProt qui sont également réferencés dans le fichier EnsemblPlant\n";
-    print "5: Afficher les protéines ayant une longueur au moins égale à une valeur\n";
-    print "6: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
+    print "5: Afficher les protéines ayant une longueur au moins égale à une valeur SQL\n";
+    print "6: Afficher les protéines ayant une longueur au moins égale à une valeur Perl\n";
+    print "7: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
     print "0: Quitter\n";
     my $b=<STDIN>;
     chomp($b);
@@ -208,6 +242,9 @@ while($a==0){
 	end_html();
     }
     elsif($b==6){
+	Longueur_Proteine_Perl();
+    }
+    elsif($b==7){
 	begin_html("Proteine_caracteristiques.html");
 	Proteine_caracteristique();
 	end_html();
@@ -216,10 +253,4 @@ while($a==0){
 	$a=1;
     }
 }
-#my $req=$dbh->prepare("select NomImmeuble,avg(Superficie) from Appart group by NomImmeuble") or die $dbh->strerr();
-#$req->execute() or die $req->errstr();
-#while (my @t = $req->fetchrow_array()){
-    #print join(" ",@t),"\n";
-#}
-#$req->finish;
 $dbh->disconnect();
