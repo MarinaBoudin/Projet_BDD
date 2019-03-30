@@ -16,7 +16,6 @@ while(<IN>){
 	my @val=split(/\t/,$_);
 	my $organism="'$val[5]'";
 	if($organism=~/Arabidopsis thaliana/){
-	    print "$organism \n";
 	    my $ec="'NaN'";
 	    my $entry="'$val[0]'";
 	    my $entry_name="'$val[1]'";
