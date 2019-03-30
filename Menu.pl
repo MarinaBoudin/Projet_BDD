@@ -158,9 +158,12 @@ sub Longueur_proteine{
   }
 }
 
-sub Proteine_caracteristique(){
-  print FILE "<h1 style=\"text-align:center\">Voici les caractéristiques de la protéine de votre demande</h1>\n<table style=\"border:2px solid\">\n";
-  print FILE "<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">EntryName</td>\n<td style=\"border:2px solid;color:red;text-align:center\">GeneName</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Synonymous</td>\n<td style=\"border:2px solid;color:red;text-align:center\">GeneOntology</td>\n<td style=\"border:2px solid;color:red;text-align:center\">ProteineName</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Sequence</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Statut</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Length</td>\n<td style=\"border:2px solid;color:red;text-align:center\">ECNumber</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Entry</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Organism</td>\n<td style=\"border:2px solid;color:red;text-align:center\">EnsemblPlants</td>\n<td style=\"border:2px solid;color:red;text-align:center\">TranscriptStableID</td>\n<td style=\"border:2px solid;color:red;text-align:center\">GenestableID</td>\n<td style=\"border:2px solid;color:red;text-align:center\">PlantReactomeId</td>\n</tr>\n";
+sub Proteine_caracteristique{
+  my $choix=shift;
+  if ($choix==1){
+    print FILE "<h1 style=\"text-align:center\">Voici les caractéristiques de la protéine de votre demande</h1>\n<table style=\"border:2px solid\">\n";
+    print FILE "<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">EntryName</td>\n<td style=\"border:2px solid;color:red;text-align:center\">GeneName</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Synonymous</td>\n<td style=\"border:2px solid;color:red;text-align:center\">GeneOntology</td>\n<td style=\"border:2px solid;color:red;text-align:center\">ProteineName</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Sequence</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Statut</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Length</td>\n<td style=\"border:2px solid;color:red;text-align:center\">ECNumber</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Entry</td>\n<td style=\"border:2px solid;color:red;text-align:center\">Organism</td>\n<td style=\"border:2px solid;color:red;text-align:center\">EnsemblPlants</td>\n<td style=\"border:2px solid;color:red;text-align:center\">TranscriptStableID</td>\n<td style=\"border:2px solid;color:red;text-align:center\">GenestableID</td>\n<td style=\"border:2px solid;color:red;text-align:center\">PlantReactomeId</td>\n</tr>\n";
+  }
   print "\nRentrez l'EC number de la protéine : \n";
   $EC=<STDIN>;
   chomp($EC);
@@ -169,14 +172,18 @@ sub Proteine_caracteristique(){
   $req->execute() or die $req->errstr();
   while (my @t = $req->fetchrow_array()){
     print join(" ",@t),"\n";
-    print FILE "<tr>\n";
-    for my $x(@t){
-      print FILE "<td style=\"border:1px solid\">$x</td>\n";
+    if ($choix==1){
+      print FILE "<tr>\n";
+      for my $x(@t){
+        print FILE "<td style=\"border:1px solid\">$x</td>\n";
+      }
+      print FILE "</tr>\n";
     }
-    print FILE "</tr>\n";
   }
   $req->finish;
-  print FILE "</table>\n";
+  if ($choix==1){
+    print FILE "</table>\n";
+  }
 }
 
 sub begin_html{
@@ -238,7 +245,10 @@ while($a==0){
     chomp($choix);
     $choix=int($choix);
     if ($choix==1){
-      begin_html("Longueur_proteine.html");
+      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+      $choix=<STDIN>;
+      chomp($choix);
+      begin_html($choix);
       Longueur_proteine(1);
       end_html();
     }
@@ -247,9 +257,21 @@ while($a==0){
     }
   }
   elsif($b==6){
-    begin_html("Proteine_caracteristiques.html");
-    Proteine_caracteristique();
-    end_html();
+    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+    my $choix=<STDIN>;
+    chomp($choix);
+    $choix=int($choix);
+    if ($choix==1){
+      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+      $choix=<STDIN>;
+      chomp($choix);
+      begin_html($choix);
+      Proteine_caracteristique(1);
+      end_html();
+    }
+    elsif($choix==2){
+      Proteine_caracteristique(2);
+    }
   }
   elsif($b==0){
     $a=1;
