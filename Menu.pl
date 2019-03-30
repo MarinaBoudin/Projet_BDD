@@ -114,7 +114,6 @@ sub Nom_proteine(){
 
 sub Nom_genes{
   my $choix=shift;
-  print "coucou";
   if ($choix==1){
     print FILE "<h1 style=\"text-align:center\">Voici le nom des gènes</h1>\n<table style=\"border:2px solid\">\n<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">Nom des gènes</td></tr>\n";
   }
@@ -132,9 +131,12 @@ sub Nom_genes{
   $req->finish;
 }
 
-sub Longueur_proteine(){
+sub Longueur_proteine{
+  my $choix=shift;
   $compteur=0;
-  print FILE "<h1 style=\"text-align:center\">Voici le nom des protéines correspondant à votre demande</h1>\n<table style=\"border:2px solid\">\n<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">Nom des protéines</td></tr>\n";
+  if ($choix==1){
+    print FILE "<h1 style=\"text-align:center\">Voici le nom des protéines correspondant à votre demande</h1>\n<table style=\"border:2px solid\">\n<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">Nom des protéines</td></tr>\n";
+  }
   print "\nRentrez le valeur minimum de la longueur des séquences :\n";
   my $longueur=<STDIN>;
   chomp($longueur);
@@ -143,12 +145,16 @@ sub Longueur_proteine(){
   $req->execute() or die $req->errstr();
   while (my @t = $req->fetchrow_array()){
     print join(" ",@t),"\n";
-    print FILE "<tr>\n<td>",join(" ",@t),"</td>\n</tr>\n";
+    if ($choix==1){
+      print FILE "<tr>\n<td>",join(" ",@t),"</td>\n</tr>\n";
+    }
     $compteur=$compteur+1;
   }
   $req->finish;
   print "\nNombre de protéines de longueur $longueur : $compteur\n";
-  print FILE "</table>\n<p> Il y a $compteur protéines de longueur $longueur</p>\n";
+  if (choix==1){
+    print FILE "</table>\n<p> Il y a $compteur protéines de longueur $longueur</p>\n";
+  }
 }
 
 sub Proteine_caracteristique(){
@@ -211,7 +217,10 @@ while($a==0){
     chomp($choix);
     $choix=int($choix);
     if ($choix==1){
-      begin_html("Nom_gene.html");
+      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+      $choix=<STDIN>;
+      chomp($choix);
+      begin_html($choix);
       Nom_genes(1);
       end_html();
     }
@@ -220,9 +229,18 @@ while($a==0){
     }
   }
   elsif($b==5){
-    begin_html("Longueur_proteine.html");
-    Longueur_proteine();
-    end_html();
+    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+    my $choix=<STDIN>;
+    chomp($choix);
+    $choix=int($choix);
+    if ($choix==1){
+      begin_html("Longueur_proteine.html");
+      Longueur_proteine(1);
+      end_html();
+    }
+    elsif($choix==2){
+      Longueur_proteine(2);
+    }
   }
   elsif($b==6){
     begin_html("Proteine_caracteristiques.html");
