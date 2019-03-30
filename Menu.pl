@@ -206,10 +206,12 @@ while($a==0){
     Nom_proteine();
   }
   elsif($b==4){
+    print "ici1";
     print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
     my $choix=<STDIN>;
     chomp($choix);
     $choix=int($choix);
+    print "ici2";
     if ($choix==1){
       begin_html("Nom_gene.html");
       Nom_genes(1);
