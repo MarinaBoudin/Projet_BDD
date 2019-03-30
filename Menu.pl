@@ -197,83 +197,120 @@ sub end_html(){
   print FILE "</div>\n</body>";
   close(FILE);
 }
+sub Longueur_Proteine_Perl{
+    open(IN,"../uniprot-arabidopsisthalianaSequence.tab") || die "No file";
+    my $l1=0;
+    my %Longueur_Proteine;
+    while(<IN>){
+	$l1++;
+	if($l1!=1){
+	    my @val=split(/\t/,$_);
+	    my $organism="$val[5]";
+	    if($organism=~/Arabidopsis thaliana/){
+		my $entry="$val[0]";
+		my $protein_name="$val[3]";
+		my $length=int($val[6]);
+		$Longueur_Proteine{$entry}=[$length,$protein_name];
+	    }
+	}
+    }
+    close(IN);
+    $compteur=0;
+    print "\nRentrez la valeur minimum de la longueur des séquence :(Perl)\n";
+    my $longueur=<STDIN>;
+    chomp($longueur);
+    $longueur=int($longueur);
+    foreach my $key(keys %Longueur_Proteine){
+	if($Longueur_Proteine{$key}[0]>=$longueur){
+	    $compteur++;
+	    print "$Longueur_Proteine{$key}[1] \n";
+	}
+    }
+    print "Nombre de Protéines de longueur $longueur : $compteur (Perl)\n";
+}
+
+
 
 #Menu
 
 my $a=0;
 while($a==0){
-  print "\n1: Ajouter une protéine\n";
-  print "2: Modifier/Corriger une séquence\n";
-  print "3: Afficher le nom des protéines qui sont référencés dans le fichier EnsemblPlant\n";
-  print "4: Afficher le nom des gènes du fichier UniProt qui sont également réferencés dans le fichier EnsemblPlant\n";
-  print "5: Afficher les protéines ayant une longueur au moins égale à une valeur\n";
-  print "6: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
-  print "0: Quitter\n";
-  my $b=<STDIN>;
-  chomp($b);
-  $b=int($b);
-  if ($b==1){
-    Ajouter_proteine();
-  }
-  elsif($b==2){
-    Modifier_Corriger();
-  }
-  elsif($b==3){
-    Nom_proteine();
-  }
-  elsif($b==4){
-    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
-    my $choix=<STDIN>;
-    chomp($choix);
-    $choix=int($choix);
-    if ($choix==1){
-      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
-      $choix=<STDIN>;
-      chomp($choix);
-      begin_html($choix);
-      Nom_genes(1);
-      end_html();
+    print "1: Ajouter une protéine\n";
+    print "2: Modifier/Corriger une séquence\n";
+    print "3: Afficher le nom des protéines qui sont référencés dans le fichier EnsemblPlant\n";
+    print "4: Afficher le nom des gènes du fichier UniProt qui sont également réferencés dans le fichier EnsemblPlant\n";
+    print "5: Afficher les protéines ayant une longueur au moins égale à une valeur SQL\n";
+    print "6: Afficher les protéines ayant une longueur au moins égale à une valeur Perl\n";
+    print "7: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
+    print "0: Quitter\n";
+    my $b=<STDIN>;
+    chomp($b);
+    $b=int($b);
+    if ($b==1){
+	Ajouter_proteine();
     }
-    elsif($choix==2){
-      Nom_genes(2);
+    elsif($b==2){
+	Modifier_Corriger();
     }
-  }
-  elsif($b==5){
-    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
-    my $choix=<STDIN>;
-    chomp($choix);
-    $choix=int($choix);
-    if ($choix==1){
-      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
-      $choix=<STDIN>;
-      chomp($choix);
-      begin_html($choix);
-      Longueur_proteine(1);
-      end_html();
+    elsif($b==3){
+	Nom_proteine();
     }
-    elsif($choix==2){
-      Longueur_proteine(2);
+    elsif($b==4){
+	print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+	my $choix=<STDIN>;
+	chomp($choix);
+	$choix=int($choix);
+	if ($choix==1){
+	    print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+	    $choix=<STDIN>;
+	    chomp($choix);
+	    begin_html($choix);
+	    Nom_genes(1);
+	    end_html();
+	}
+	elsif($choix==2){
+	    Nom_genes(2);
+	}
     }
-  }
-  elsif($b==6){
-    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
-    my $choix=<STDIN>;
-    chomp($choix);
-    $choix=int($choix);
-    if ($choix==1){
-      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
-      $choix=<STDIN>;
-      chomp($choix);
-      begin_html($choix);
-      Proteine_caracteristique(1);
-      end_html();
+    elsif($b==5){
+	print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+	my $choix=<STDIN>;
+	chomp($choix);
+	$choix=int($choix);
+	if ($choix==1){
+	    print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+	    $choix=<STDIN>;
+	    chomp($choix);
+	    begin_html($choix);
+	    Longueur_proteine(1);
+	    end_html();
+	}
+	elsif($choix==2){
+	    Longueur_proteine(2);
+	}
     }
-    elsif($choix==2){
-      Proteine_caracteristique(2);
+    elsif($b==6){
+	Longueur_Proteine_Perl();
     }
-  }
-  elsif($b==0){
-    $a=1;
-  }
+    elsif($b==7){
+	print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+	my $choix=<STDIN>;
+	chomp($choix);
+	$choix=int($choix);
+	if ($choix==1){
+	    print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+	    $choix=<STDIN>;
+	    chomp($choix);
+	    begin_html($choix);
+	    Proteine_caracteristique(1);
+	    end_html();
+	}
+	elsif($choix==2){
+	    Proteine_caracteristique(2);
+	}
+    }
+    elsif($b==0){
+	$a=1;
+    }
 }
 $dbh->disconnect();
