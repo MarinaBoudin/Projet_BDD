@@ -113,7 +113,7 @@ sub Nom_proteine(){
 }
 
 sub Nom_genes{
-  my $choix=shift+".html";
+  my $choix=(shift)+".html";
   print "$choix";
   if ($choix==1){
     print FILE "<h1 style=\"text-align:center\">Voici le nom des gènes</h1>\n<table style=\"border:2px solid\">\n<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">Nom des gènes</td></tr>\n";
