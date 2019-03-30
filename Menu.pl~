@@ -235,6 +235,7 @@ sub Longueur_Proteine_Perl{
 
 my $a=0;
 while($a==0){
+<<<<<<< HEAD
     print "1: Ajouter une protéine\n";
     print "2: Modifier/Corriger une séquence\n";
     print "3: Afficher le nom des protéines qui sont référencés dans le fichier EnsemblPlant\n";
@@ -251,67 +252,99 @@ while($a==0){
     }
     elsif($b==2){
 	Modifier_Corriger();
+=======
+  print "\n1: Ajouter une protéine\n";
+  print "2: Modifier/Corriger une séquence\n";
+  print "3: Afficher le nom des protéines qui sont référencés dans le fichier EnsemblPlant\n";
+  print "4: Afficher le nom des gènes du fichier UniProt qui sont également réferencés dans le fichier EnsemblPlant\n";
+  print "5: Afficher les protéines ayant une longueur au moins égale à une valeur\n";
+  print "6: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
+  print "0: Quitter\n";
+  my $b=<STDIN>;
+  chomp($b);
+  $b=int($b);
+  if ($b==1){
+    Ajouter_proteine();
+  }
+  elsif($b==2){
+    Modifier_Corriger();
+  }
+  elsif($b==3){
+    Nom_proteine();
+  }
+  elsif($b==4){
+    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+    my $choix=<STDIN>;
+    chomp($choix);
+    $choix=int($choix);
+    if ($choix==1){
+      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+      $choix=<STDIN>;
+      chomp($choix);
+      begin_html($choix);
+      Nom_genes(1);
+      end_html();
+>>>>>>> 3953a4bcd7eb5ab44275ec24072fd9917de1b7db
     }
-    elsif($b==3){
-	Nom_proteine();
+    elsif($choix==2){
+      Nom_genes(2);
     }
-    elsif($b==4){
-	print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
-	my $choix=<STDIN>;
-	chomp($choix);
-	$choix=int($choix);
-	if ($choix==1){
-	    print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
-	    $choix=<STDIN>;
-	    chomp($choix);
-	    begin_html($choix);
-	    Nom_genes(1);
-	    end_html();
-	}
-	elsif($choix==2){
-	    Nom_genes(2);
-	}
+  }
+  elsif($b==5){
+    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+    my $choix=<STDIN>;
+    chomp($choix);
+    $choix=int($choix);
+    if ($choix==1){
+      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+      $choix=<STDIN>;
+      chomp($choix);
+      begin_html($choix);
+      Longueur_proteine(1);
+      end_html();
     }
-    elsif($b==5){
-	print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
-	my $choix=<STDIN>;
-	chomp($choix);
-	$choix=int($choix);
-	if ($choix==1){
-	    print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
-	    $choix=<STDIN>;
-	    chomp($choix);
-	    begin_html($choix);
-	    Longueur_proteine(1);
-	    end_html();
-	}
-	elsif($choix==2){
-	    Longueur_proteine(2);
-	}
+    elsif($choix==2){
+      Longueur_proteine(2);
     }
+<<<<<<< HEAD
     elsif($b==6){
 	Longueur_Proteine_Perl();
     }
     elsif($b==7){
-	print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
-	my $choix=<STDIN>;
-	chomp($choix);
-	$choix=int($choix);
-	if ($choix==1){
-	    print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
-	    $choix=<STDIN>;
-	    chomp($choix);
-	    begin_html($choix);
-	    Proteine_caracteristique(1);
-	    end_html();
-	}
-	elsif($choix==2){
-	    Proteine_caracteristique(2);
-	}
+	begin_html("Proteine_caracteristiques.html");
+	Proteine_caracteristique();
+	end_html();
+=======
+  }
+  elsif($b==6){
+    print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
+    my $choix=<STDIN>;
+    chomp($choix);
+    $choix=int($choix);
+    if ($choix==1){
+      print "\nQuel nom voulez-vous donner au fichier de sauvegarde ?\n";
+      $choix=<STDIN>;
+      chomp($choix);
+      begin_html($choix);
+      Proteine_caracteristique(1);
+      end_html();
+>>>>>>> 3953a4bcd7eb5ab44275ec24072fd9917de1b7db
     }
-    elsif($b==0){
-	$a=1;
+    elsif($choix==2){
+      Proteine_caracteristique(2);
     }
+  }
+  elsif($b==0){
+    $a=1;
+  }
 }
-
+<<<<<<< HEAD
+=======
+#my $req=$dbh->prepare("select NomImmeuble,avg(Superficie) from Appart group by NomImmeuble") or die $dbh->strerr();
+#$req->execute() or die $req->errstr();
+#while (my @t = $req->fetchrow_array()){
+#print join(" ",@t),"\n";
+#}
+#$req->finish;
+>>>>>>> 3953a4bcd7eb5ab44275ec24072fd9917de1b7db
 $dbh->disconnect();
