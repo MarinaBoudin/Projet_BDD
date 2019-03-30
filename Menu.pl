@@ -276,10 +276,4 @@ while($a==0){
     $a=1;
   }
 }
-#my $req=$dbh->prepare("select NomImmeuble,avg(Superficie) from Appart group by NomImmeuble") or die $dbh->strerr();
-#$req->execute() or die $req->errstr();
-#while (my @t = $req->fetchrow_array()){
-#print join(" ",@t),"\n";
-#}
-#$req->finish;
 $dbh->disconnect();
