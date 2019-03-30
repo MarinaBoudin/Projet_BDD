@@ -193,12 +193,8 @@ while($a==0){
   print "5: Afficher les protéines ayant une longueur au moins égale à une valeur\n";
   print "6: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
   print "0: Quitter\n";
-  my $b=<STDIN>;
-  print "coucou1";
   chomp($b);
-  print "coucou2";
   $b=int($b);
-  print "coucou3";
   if ($b==1){
     Ajouter_proteine();
   }
@@ -209,12 +205,10 @@ while($a==0){
     Nom_proteine();
   }
   elsif($b==4){
-    print "ici1";
     print "\nVoudrez-vous sauvegarder votre recherche ?\n1: Oui\n2: Non\n";
     my $choix=<STDIN>;
     chomp($choix);
     $choix=int($choix);
-    print "ici2";
     if ($choix==1){
       begin_html("Nom_gene.html");
       Nom_genes(1);
