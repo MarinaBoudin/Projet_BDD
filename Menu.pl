@@ -64,7 +64,6 @@ sub Ajouter_proteine(){
   $ECnumber=<STDIN>;
   chomp($ECnumber);
   $ECnumber="'$ECnumber'";
-  $dbh->do("insert into NameUniprot values($Ename,$Genename,$Synonymous,$Ontology,$Protname,$Seq,$Statut,$Length,$ECnumber)");
   print "coucou";
   print "\nRentrez le code Entry :\n";
   $Entry=<STDIN>;
@@ -75,7 +74,6 @@ sub Ajouter_proteine(){
   print "\nRentrez le EnsemblPlants :\n";
   $Ensemblplants=<STDIN>;
   $Ensemblplants="'$Ensemblplants'";
-  $dbh->do("insert into EntreeUniprot values($Entry,$Protname,$Organism,$Ensemblplants)");
   print "\nRentrez le GeneTableID :\n";
   $ID=<STDIN>;
   $ID="'$ID'";
@@ -85,6 +83,8 @@ sub Ajouter_proteine(){
   print "\nRentrez le PlantReactomeReactionID :\n";
   $Reaction=<STDIN>;
   $Reaction="'$Reaction'";
+  $dbh->do("insert into NameUniprot values($Ename,$Genename,$Synonymous,$Ontology,$Protname,$Seq,$Statut,$Length,$ECnumber)");
+  $dbh->do("insert into EntreeUniprot values($Entry,$Protname,$Organism,$Ensemblplants)");
   $dbh->do("insert into FichierEnsembl values($ID,$Transcript,$Entry,$Reaction)");
   print "\nFini\n";
 }
@@ -94,6 +94,12 @@ sub Modifier_Corriger(){
   $Proteine=<STDIN>;
   chomp($Proteine);
   $Proteine="'$Proteine'";
+  $req=$dbh->prepare("select Sequence from NameUniprot where ProteineName=$Proteine") or die $dbh->strerr();
+  $req->execute() or die $req->errstr();
+  while (my @t = $req->fetchrow_array()){
+    print join(" ",@t),"\n";
+  }
+  $req->finish;
   print "\nRentrez la nouvelle séquence de $Proteine :\n";
   $New_seq=<STDIN>;
   chomp($New_seq);
