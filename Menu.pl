@@ -25,9 +25,15 @@ my $Proteine;
 my $New_seq;
 my $EC;
 my $ECnumber;
+my $EMBLID;
+
 
 
 sub Ajouter_proteine(){
+  print "\nRentrez le code Entry :\n";
+  $Entry=<STDIN>;
+  chomp($Entry);
+  $Entry="'$Entry'";
   print "Rentrez l'Entryname\n";
   $Ename=<STDIN>;
   chomp($Ename);
@@ -52,7 +58,7 @@ sub Ajouter_proteine(){
   $Seq=<STDIN>;
   chomp($Seq);
   $Seq="'$Seq'";
-  print "\nRentrez le Statut de la séquence :\n";
+  print "\nRentrez le Status de la séquence : (reviewed/unreviewed)\n";
   $Statut=<STDIN>;
   chomp($Statut);
   $Statut="'$Statut'";
@@ -64,28 +70,31 @@ sub Ajouter_proteine(){
   $ECnumber=<STDIN>;
   chomp($ECnumber);
   $ECnumber="'$ECnumber'";
-  print "coucou";
-  print "\nRentrez le code Entry :\n";
-  $Entry=<STDIN>;
-  $Entry="'$Entry'";
   print "\nRentrez le nom de l'organisme :\n";
   $Organism=<STDIN>;
   $Organism="'$Organism'";
   print "\nRentrez le EnsemblPlants :\n";
   $Ensemblplants=<STDIN>;
   $Ensemblplants="'$Ensemblplants'";
+  print "\nRentrez le UniprotKBTrEMBLID :\n";
+  $EMBLID=<STDIN>;
+  chomp($EMBLID);
+  $EMBLID="'$EMBLID'";
   print "\nRentrez le GeneTableID :\n";
   $ID=<STDIN>;
+  chomp($ID);
   $ID="'$ID'";
   print "\nRentrez le Transcript :\n";
   $Transcript=<STDIN>;
+  chomp($Transcript);
   $Transcript="'$Transcript'";
   print "\nRentrez le PlantReactomeReactionID :\n";
   $Reaction=<STDIN>;
+  chomp($Reaction);
   $Reaction="'$Reaction'";
-  $dbh->do("insert into NameUniprot values($Ename,$Genename,$Synonymous,$Ontology,$Protname,$Seq,$Statut,$Length,$ECnumber)");
-  $dbh->do("insert into EntreeUniprot values($Entry,$Protname,$Organism,$Ensemblplants)");
-  $dbh->do("insert into FichierEnsembl values($ID,$Transcript,$Entry,$Reaction)");
+  $dbh->do("insert into MetaDonneesUniprot values($Entry,$Ename,$Statut,$Organism,$Ensemblplants)");
+  $dbh->do("insert into DonneesUniprot values($Ename,$Genename,$Synonymous,$Ontology,$Protname,$Seq,$Length,$ECnumber)");
+  $dbh->do("insert into DonneesEnsembl values($EMBLID,$Transcript,$ID,$Reaction)");
   print "\nFini\n";
 }
 
@@ -94,7 +103,7 @@ sub Modifier_Corriger(){
   $Proteine=<STDIN>;
   chomp($Proteine);
   $Proteine="'$Proteine'";
-  $req=$dbh->prepare("select Sequence from NameUniprot where ProteineName=$Proteine") or die $dbh->strerr();
+  $req=$dbh->prepare("select Sequence from DonneesUniprot where ProteineName=$Proteine") or die $dbh->strerr();
   $req->execute() or die $req->errstr();
   while (my @t = $req->fetchrow_array()){
     print join(" ",@t),"\n";
@@ -104,13 +113,13 @@ sub Modifier_Corriger(){
   $New_seq=<STDIN>;
   chomp($New_seq);
   $New_seq="'$New_seq'";
-  $req=$dbh->prepare("update NameUniprot set Sequence=$New_seq where ProteineName=$Proteine") or die $dbh->strerr();
+  $req=$dbh->prepare("update DonneesUniprot set Sequence=$New_seq where ProteineName=$Proteine") or die $dbh->strerr();
   $req->execute() or die $req->errstr();
   $req->finish;
 }
 
 sub Nom_proteine(){
-  $req=$dbh->prepare("select ProteineName,Length from NameUniprot where EntryName in (select EntryName from EntreeUniprot where Entry in (select UniprotKBTrEMBLID from FichierEnsembl))") or die $dbh->strerr();
+  $req=$dbh->prepare("select ProteineName,Length from DonneesUniprot where EntryName in (select EntryName from MetaDonneesUniprot where Entry in (select UniprotKBTrEMBLID from DonneesEnsembl))") or die $dbh->strerr();
   $req->execute() or die $req->errstr();
   while (my @t = $req->fetchrow_array()){
     print join(" ",@t),"\n";
@@ -124,7 +133,7 @@ sub Nom_genes{
   if ($choix==1){
     print FILE "<h1 style=\"text-align:center\">Voici le nom des gènes</h1>\n<table style=\"border:2px solid\">\n<tr>\n<td style=\"border:2px solid;color:red;text-align:center\">Nom des gènes</td></tr>\n";
   }
-  $req=$dbh->prepare("select GeneName from NameUniprot where EntryName in (select EntryName from EntreeUniprot where Entry in (select UniprotKBTrEMBLID from FichierEnsembl))") or die $dbh->strerr();
+  $req=$dbh->prepare("select GeneName from DonneesUniprot where EntryName in (select EntryName from MetaDonneesUniprot where Entry in (select UniprotKBTrEMBLID from DonneesEnsembl))") or die $dbh->strerr();
   $req->execute() or die $req->errstr();
   while (my @t = $req->fetchrow_array()){
     print join(" ",@t),"\n";
@@ -148,7 +157,7 @@ sub Longueur_proteine{
   my $longueur=<STDIN>;
   chomp($longueur);
   $longueur=int($longueur);
-  $req=$dbh->prepare("select ProteineName from NameUniprot where Length>=$longueur") or die $dbh->strerr();
+  $req=$dbh->prepare("select ProteineName from DonneesUniprot where Length>=$longueur") or die $dbh->strerr();
   $req->execute() or die $req->errstr();
   while (my @t = $req->fetchrow_array()){
     print join(" ",@t),"\n";
@@ -164,6 +173,51 @@ sub Longueur_proteine{
   }
 }
 
+sub Longueur_Proteine_Perl{
+    open(IN,"../uniprot-arabidopsisthalianaSequence.tab") || die "No file";
+    my $ligne1=0;
+    my %Longueur_Proteine;
+    while(<IN>){
+	$ligne1++;
+	if($ligne1!=1){
+	    my @val=split(/\t/,$_);
+	    my $organism="$val[5]";
+	    if($organism=~/Arabidopsis thaliana/){
+		my $ec="NaN";
+		my $entry="$val[0]";
+		my $entry_name="$val[1]";
+		my $status="$val[2]";
+		my $protein_name="$val[3]";
+		if($protein_name=~/(EC\s(\d+|\-)\.(\d+|\-)\.(\d+|\-)\.(\d+|\-))/){
+		    $ec="$1";
+		}
+		my $gene_name="$val[4]";
+		my $length=int($val[6]);
+		my $gene_namesyn="$val[7]";
+		my $gene_ontology="$val[8]";
+		my $ensembl="$val[9]";
+		my $sequence="$val[10]";
+		$Longueur_Proteine{$entry}=[$entry_name,$status,$protein_name,$gene_name,$length,$gene_namesyn,$gene_ontology,$ensembl,$sequence,$ec];	    
+	    }
+	}
+    }
+    $compteur=0;
+    print "\nRentrez la valeur minimum de la longueur des séquence :(Perl)\n";
+    my $longueur=<STDIN>;
+    chomp($longueur);
+    $longueur=int($longueur);
+    foreach my $key(keys %Longueur_Proteine){
+	if($Longueur_Proteine{$key}[4]>=$longueur){
+	    $compteur++;
+	    for my $i(0 .. $#{ $Longueur_Proteine{$key}}){
+		print "$Longueur_Proteine{$key}[$i] \n";
+	    }
+	    print "\n";
+	}
+    }
+    print "Nombre de Protéines de longueur $longueur : $compteur (Perl)\n";
+}
+		
 sub Proteine_caracteristique{
   my $choix=shift;
   if ($choix==1){
@@ -174,7 +228,7 @@ sub Proteine_caracteristique{
   $EC=<STDIN>;
   chomp($EC);
   $EC="'$EC'";
-  $req=$dbh->prepare("select NameUniprot.Entryname,Genename,Synonymous,GeneOntology,ProteineName,Sequence,Statut,Length,ECNumber,Entry,Organism,EnsemblPlants,TranscriptStableID,GenestableID,PlantReactomeId from NameUniprot join EntreeUniprot on NameUniprot.EntryName=EntreeUniprot.EntryName join FichierEnsembl on EntreeUniprot.Entry=FichierEnsembl.UniprotKBTrEMBLID where ECNumber=$EC") or die $dbh->strerr();
+  $req=$dbh->prepare("select DonneesUniprot.Entryname,Genename,GeneNameSynonymous,GeneOntology,ProteineName,Sequence,Status,Length,ECNumber,Entry,Organism,EnsemblPlants,TranscriptStableID,GenestableID,PlantReactomeId from DonneesUniprot join MetaDonneesUniprot on DonneesUniprot.EntryName=MetaDonneesUniprot.EntryName join DonneesEnsembl on MetaDonneesUniprot.Entry=DonneesEnsembl.UniprotKBTrEMBLID where ECNumber=$EC") or die $dbh->strerr();
   $req->execute() or die $req->errstr();
   while (my @t = $req->fetchrow_array()){
     print join(" ",@t),"\n";
@@ -202,47 +256,7 @@ sub end_html(){
   print FILE "</div>\n</body>";
   close(FILE);
 }
-sub Longueur_Proteine_Perl{
-    open(IN,"../uniprot-arabidopsisthalianaSequence.tab") || die "No file";
-    my $l1=0;
-    my %Longueur_Proteine;
-    while(<IN>){
-	$l1++;
-	if($l1!=1){
-	    my @val=split(/\t/,$_);
-	    my $organism="$val[5]";
-	if($organism=~/Arabidopsis thaliana/){
-	    my $ec="'NaN'";
-	    my $entry="$val[0]";
-	    my $entry_name="$val[1]";
-	    my $statut="$val[2]";
-	    my $protein_name="$val[3]";
-	    if($protein_name=~/(EC\s(\d+|\-)\.(\d+|\-)\.(\d+|\-)\.(\d+|\-))/){
-		$ec="$1";
-	    }
-	    my $gene_name="$val[4]";
-	    my $length=int($val[6]);
-	    my $gene_namesyn="$val[7]";
-	    my $gene_ontology="$val[8]";
-	    my $ensembl="$val[9]";
-	    my $sequence="$val[10]";
-	    $Longueur_Proteine{$entry}=[$entry_name,$statut,$protein_name,$gene_name,$length,$gene_namesyn,$gene_ontology,$ensembl,$sequence];}
-	}
-    }
-    close(IN);
-    $compteur=0;
-    print "\nRentrez la valeur minimum de la longueur des séquence :(Perl)\n";
-    my $longueur=<STDIN>;
-    chomp($longueur);
-    $longueur=int($longueur);
-    foreach my $key(keys %Longueur_Proteine){
-	if($Longueur_Proteine{$key}[4]>=$longueur){
-	    $compteur++;
-	    print "$Longueur_Proteine{$key}[0]  $Longueur_Proteine{$key}[1]  $Longueur_Proteine{$key}[2]  $Longueur_Proteine{$key}[3]  $Longueur_Proteine{$key}[4]  $Longueur_Proteine{$key}[5]  $Longueur_Proteine{$key}[6]  $Longueur_Proteine{$key}[7]  $Longueur_Proteine{$key}[8] \n";
-	}
-    }
-    print "Nombre de Protéines de longueur $longueur : $compteur (Perl)\n";
-}
+
 
 
 
@@ -255,7 +269,7 @@ while($a==0){
     print "3: Afficher le nom des protéines qui sont référencés dans le fichier EnsemblPlant\n";
     print "4: Afficher le nom des gènes du fichier UniProt qui sont également réferencés dans le fichier EnsemblPlant\n";
     print "5: Afficher les protéines ayant une longueur au moins égale à une valeur SQL\n";
-    print "6: Afficher les protéines ayant une longueur au moins égale à une valeur Perl\n";
+    print "6: Afficher les caractéristiques des protéines ayant une longueur au moins égale à une valeur Perl\n";
     print "7: Afficher les caractéristiques de la ou les protéines correspondant à un E.C. number\n";
     print "0: Quitter\n";
     my $b=<STDIN>;
