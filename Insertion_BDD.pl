@@ -1,23 +1,26 @@
 #!usr/bin/perl
+#Marina BOUDIN
+#Domitille COQ--ETCHEGARAY
 use strict;
 use warnings;
 use DBI;
 
-
-#Connexion de la base de donnee
+#Connexion a la base de donnees 
 my $dbh=DBI->connect("DBI:Pg:dbname=dcetchegaray;host=dbserver","dcetchegaray","b2wehd7t",{'RaiseError' => 1});
-#Connexion de la base de donnee
 
 #Creation des tables et de leurs attributs
-$dbh->do("CREATE TABLE MetaDonneesUniprot(Entry varchar(100) constraint cle_Entree primary key, EntryName text UNIQUE, Status varchar(25) constraint R_U check(Status in ('reviewed','unreviewed')), Organism text, EnsemblPlants text)");
-$dbh->do("CREATE TABLE DonneesUniprot(EntryName text constraint cle_EntreeNom primary key references MetaDonneesUniprot(EntryName), GeneName text, GeneNameSynonymous text, GeneOntology text, ProteineName text, Sequence text, Length int check(Length>0), ECNumber text)");
-$dbh->do("CREATE TABLE DonneesEnsembl(UniprotKBTrEMBLID varchar(100) constraint cle_Fichiermart primary key, TranscriptStableID varchar(100), GeneStableID varchar(100), PlantReactomeId text)");
+sub Create_Table(){
+    $dbh->do("CREATE TABLE MetaDonneesUniprot(Entry varchar(100) constraint cle_Entree primary key, EntryName text UNIQUE, Status varchar(25) constraint R_U check(Status in ('reviewed','unreviewed')), Organism text, EnsemblPlants text)");
+    $dbh->do("CREATE TABLE DonneesUniprot(EntryName text constraint cle_EntreeNom primary key references MetaDonneesUniprot(EntryName), GeneName text, GeneNameSynonymous text, GeneOntology text, ProteineName text, Sequence text, Length int check(Length>0), ECNumber text)");
+    $dbh->do("CREATE TABLE DonneesEnsembl(UniprotKBTrEMBLID varchar(100) constraint cle_Fichiermart primary key references MetaDonneesUniprot(Entry), TranscriptStableID varchar(100), GeneStableID varchar(100), PlantReactomeId text)");
+}
 
-
+#Insertion des donnees du fichier Uniprot .tab 
 sub FichierUniprot(){
     open(IN,"../uniprot-arabidopsisthalianaSequence.tab") || die "No file";
     my $ligne1=0;
     my %Longueur_Proteine;
+    my @test_entry;
     while(<IN>){
 	$ligne1++;
 	$_=~s/'//g;
@@ -27,6 +30,7 @@ sub FichierUniprot(){
 	    if($organism=~/Arabidopsis thaliana/){
 		my $ec="'NaN'";
 		my $entry="'$val[0]'";
+		push(@test_entry,$entry);
 		my $entry_name="'$val[1]'";
 		my $status="'$val[2]'";
 		my $protein_name="'$val[3]'";
@@ -47,10 +51,13 @@ sub FichierUniprot(){
     }
     close(IN);
     print "Termine Insertion Uniprot \n";
+    return @test_entry;
 }
 
-sub FichierEnsembl(){
+#Insertion des donnees du fichier Ensembl .csv
+sub FichierEnsembl($){
     open(IN_2,"../mart_export.csv") || die "No file";
+    my @test=@{$_[0]};
     my $ligne1=0;
     my @doublon;
     push(@doublon,"");
@@ -60,7 +67,7 @@ sub FichierEnsembl(){
 	if($ligne1!=1){
 	    my @val=split(/,/,$_);
 	    my $Uniprot="'$val[2]'";
-	    if(($Uniprot ~~ @doublon) eq ""  && $Uniprot ne ''){
+	    if(($Uniprot ~~ @doublon) eq ""  && $Uniprot ne '' && ($Uniprot ~~ @test)==1){
 		my $GeneStable="'$val[0]'";
 		my $Transcript="'$val[1]'";
 		my $PlantReac="'$val[3]'";
@@ -74,8 +81,10 @@ sub FichierEnsembl(){
 }
 
 
+#Main
+Create_Table();
+my @entry=FichierUniprot();
+FichierEnsembl(\@entry);
 
-FichierUniprot();
-FichierEnsembl();
-
+#Deconnexion
 $dbh->disconnect();
