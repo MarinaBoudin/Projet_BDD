@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use DBI;
 
+#Declaration des variables
 my $dbh=DBI->connect("DBI:Pg:dbname=dcetchegaray;host=dbserver","dcetchegaray","b2wehd7t",{'RaiseError'=>1});
 my $req;
 my $compteur=0;
@@ -94,10 +95,12 @@ sub Ajouter_proteine(){
   $Reaction=<STDIN>;
   chomp($Reaction);
   $Reaction="'$Reaction'";
-  $dbh->do("insert into MetaDonneesUniprot values($Entry,$Ename,$Statut,$Organism,$Ensemblplants)");
-  $dbh->do("insert into DonneesUniprot values($Ename,$Genename,$Synonymous,$Ontology,$Protname,$Seq,$Length,$ECnumber)");
-  $dbh->do("insert into DonneesEnsembl values($EMBLID,$Transcript,$ID,$Reaction)");
-  print "\nFini\n";
+  if(($Organism=~/Arabidopsis thaliana/) && ($Statut=~/(reviewed|unreviewed)/)){
+      $dbh->do("insert into MetaDonneesUniprot values($Entry,$Ename,$Statut,$Organism,$Ensemblplants)");
+      $dbh->do("insert into DonneesUniprot values($Ename,$Genename,$Synonymous,$Ontology,$Protname,$Seq,$Length,$ECnumber)");
+      $dbh->do("insert into DonneesEnsembl values($EMBLID,$Transcript,$ID,$Reaction)");
+      print "\nFini\n";
+  }else{print "Erreur dans la saisie des informations \n";}
 }
 
 sub Modifier_Corriger(){
@@ -208,6 +211,7 @@ sub Longueur_Proteine_Perl{
     my $longueur=<STDIN>;
     chomp($longueur);
     $longueur=int($longueur);
+    #Affichage des proteines correspondant a la requete
     foreach my $key(keys %Longueur_Proteine){
 	if($Longueur_Proteine{$key}[4]>=$longueur){
 	    $compteur++;

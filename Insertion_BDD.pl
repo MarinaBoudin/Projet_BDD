@@ -10,12 +10,12 @@ my $dbh=DBI->connect("DBI:Pg:dbname=dcetchegaray;host=dbserver","dcetchegaray","
 
 #Creation des tables et de leurs attributs
 sub Create_Table(){
-    $dbh->do("CREATE TABLE MetaDonneesUniprot(Entry varchar(100) constraint cle_Entree primary key, EntryName text UNIQUE, Status varchar(25) constraint R_U check(Status in ('reviewed','unreviewed')), Organism text, EnsemblPlants text)");
-    $dbh->do("CREATE TABLE DonneesUniprot(EntryName text constraint cle_EntreeNom primary key references MetaDonneesUniprot(EntryName), GeneName text, GeneNameSynonymous text, GeneOntology text, ProteineName text, Sequence text, Length int check(Length>0), ECNumber text)");
-    $dbh->do("CREATE TABLE DonneesEnsembl(UniprotKBTrEMBLID varchar(100) constraint cle_Fichiermart primary key references MetaDonneesUniprot(Entry), TranscriptStableID varchar(100), GeneStableID varchar(100), PlantReactomeId text)");
+    $dbh->do("CREATE TABLE MetaDonneesUniprot(Entry varchar(100) constraint cle_Entree PRIMARY KEY, EntryName text UNIQUE, Status varchar(25) constraint R_U check(Status in ('reviewed','unreviewed')), Organism text, EnsemblPlants text)");
+    $dbh->do("CREATE TABLE DonneesUniprot(EntryName text constraint cle_EntreeNom PRIMARY KEY REFERENCES MetaDonneesUniprot(EntryName), GeneName text, GeneNameSynonymous text, GeneOntology text, ProteineName text, Sequence text, Length int check(Length>0), ECNumber text)");
+    $dbh->do("CREATE TABLE DonneesEnsembl(UniprotKBTrEMBLID varchar(100) constraint cle_Fichiermart PRIMARY KEY REFERENCES MetaDonneesUniprot(Entry), TranscriptStableID varchar(100), GeneStableID varchar(100), PlantReactomeId text)");
 }
 
-#Insertion des donnees du fichier Uniprot .tab 
+#Insertion des donnees du fichier uniprot-arabidopsisthalianaSequence.tab
 sub FichierUniprot(){
     open(IN,"../uniprot-arabidopsisthalianaSequence.tab") || die "No file";
     my $ligne1=0;
@@ -26,16 +26,26 @@ sub FichierUniprot(){
 	$_=~s/'//g;
 	if($ligne1!=1){
 	    my @val=split(/\t/,$_);
+	    #Remplacement de toutes les valeurs nulles en NA
+	    for my $x(@val){
+		if($x eq ''){
+		    $x="NA";
+		}
+	    }
+	    #Selection des organismes
 	    my $organism="'$val[5]'";
 	    if($organism=~/Arabidopsis thaliana/){
-		my $ec="'NaN'";
+		my $ec="'NA'";
 		my $entry="'$val[0]'";
 		push(@test_entry,$entry);
 		my $entry_name="'$val[1]'";
 		my $status="'$val[2]'";
 		my $protein_name="'$val[3]'";
+		#Selection du ECNumber
 		if($protein_name=~/(EC\s(\d+|\-)\.(\d+|\-)\.(\d+|\-)\.(\d+|\-))/){
 		    $ec="'$1'";
+		    #Suppression ECNumber du ProteineName
+		    $protein_name=~s/\((EC\s(\d+|\-)\.(\d+|\-)\.(\d+|\-)\.(\d+|\-))\)//;
 		}
 		my $gene_name="'$val[4]'";
 		my $length=int($val[6]);
@@ -43,7 +53,7 @@ sub FichierUniprot(){
 		my $gene_ontology="'$val[8]'";
 		my $ensembl="'$val[9]'";
 		my $sequence="'$val[10]'";
-		$Longueur_Proteine{$entry}=[$entry_name,$status,$protein_name,$gene_name,$length,$gene_namesyn,$gene_ontology,$ensembl,$sequence];
+		#Insertion des valeurs dans la bdd
 		$dbh->do("INSERT INTO MetaDonneesUniprot VALUES($entry, $entry_name, $status, $organism, $ensembl)");
 		$dbh->do("INSERT INTO DonneesUniprot VALUES($entry_name, $gene_name, $gene_namesyn, $gene_ontology, $protein_name, $sequence, $length, $ec)");	    
 	    }
@@ -54,7 +64,7 @@ sub FichierUniprot(){
     return @test_entry;
 }
 
-#Insertion des donnees du fichier Ensembl .csv
+#Insertion des donnees du fichier mart_export.csv
 sub FichierEnsembl($){
     open(IN_2,"../mart_export.csv") || die "No file";
     my @test=@{$_[0]};
@@ -67,10 +77,12 @@ sub FichierEnsembl($){
 	if($ligne1!=1){
 	    my @val=split(/,/,$_);
 	    my $Uniprot="'$val[2]'";
+	    #test afin que Uniprot soit une cle primaire et respece la cle etrangere
 	    if(($Uniprot ~~ @doublon) eq ""  && $Uniprot ne '' && ($Uniprot ~~ @test)==1){
 		my $GeneStable="'$val[0]'";
 		my $Transcript="'$val[1]'";
 		my $PlantReac="'$val[3]'";
+		#Insertion des valeurs dans la bdd
 		$dbh->do("INSERT INTO DonneesEnsembl VALUES($Uniprot, $Transcript, $GeneStable, $PlantReac)");
 	    }
 	    push(@doublon,$Uniprot);
