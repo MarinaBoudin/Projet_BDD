@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+#Marina BOUDIN
+#Domitille COQ--ETCHEGARAY
 use strict;
 use warnings;
 use DBI;
